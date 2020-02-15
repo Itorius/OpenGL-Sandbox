@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base", "Base\Base.csproj", "{F9BB3DCE-FE5F-4C26-8251-987AF1F27A4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mandelbrot", "Mandelbrot\Mandelbrot.csproj", "{7AB2F473-54F4-41FF-B73B-E7B1691D4C5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raymarching", "Raymarching\Raymarching.csproj", "{FDAFCB39-2259-4D1E-80B1-91386D12DB71}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9BB3DCE-FE5F-4C26-8251-987AF1F27A4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9BB3DCE-FE5F-4C26-8251-987AF1F27A4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9BB3DCE-FE5F-4C26-8251-987AF1F27A4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9BB3DCE-FE5F-4C26-8251-987AF1F27A4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AB2F473-54F4-41FF-B73B-E7B1691D4C5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AB2F473-54F4-41FF-B73B-E7B1691D4C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AB2F473-54F4-41FF-B73B-E7B1691D4C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AB2F473-54F4-41FF-B73B-E7B1691D4C5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDAFCB39-2259-4D1E-80B1-91386D12DB71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDAFCB39-2259-4D1E-80B1-91386D12DB71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDAFCB39-2259-4D1E-80B1-91386D12DB71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDAFCB39-2259-4D1E-80B1-91386D12DB71}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
