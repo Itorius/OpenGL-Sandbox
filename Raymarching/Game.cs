@@ -1,4 +1,6 @@
 ﻿using Base;
+using Dear_ImGui_Sample;
+using ImGuiNET;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -14,8 +16,9 @@ namespace Raymarching
 		private double frameTime;
 
 		private OrthographicCameraController controller;
-		private Shader basicShader;
+		private Base.Shader basicShader;
 		private Matrix4 matrix;
+		private ImGuiController _controller;
 
 		public Game(int width = 1280, int height = 720, string title = "Game") : base(width, height, GraphicsMode.Default, title)
 		{
@@ -33,10 +36,14 @@ namespace Raymarching
 			}
 		}
 
+		private int buffer;
+
 		protected override unsafe void OnLoad(EventArgs e)
 		{
+			_controller = new ImGuiController(Width, Height);
+
 			controller = new OrthographicCameraController(this);
-			basicShader = new Shader("Basic.vert", "Basic.frag");
+			basicShader = new Base.Shader("Basic.vert", "Basic.frag");
 
 			int index = GL.GetUniformBlockIndex(basicShader.ID, "LightingBlock");
 			GL.UniformBlockBinding(basicShader.ID, index, 0);
@@ -65,7 +72,7 @@ namespace Raymarching
 				new Vertex(new Vector3(-1.6f, 0.9f, 0f), new Vector2(-1f, 1f))
 			};
 
-			GL.GenBuffers(1, out int buffer);
+			GL.GenBuffers(1, out buffer);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
 			GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(Vertex), vertices, BufferUsageHint.StaticDraw);
 
@@ -74,6 +81,8 @@ namespace Raymarching
 
 			GL.EnableVertexAttribArray(1);
 			GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), sizeof(Vector3));
+
+			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 		}
 
 		protected override void OnResize(EventArgs e)
@@ -107,17 +116,19 @@ namespace Raymarching
 
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
+			base.OnRenderFrame(e);
+
 			frameTime = frameTime * smoothing + e.Time * (1.0 - smoothing);
-			Console.WriteLine(1 / frameTime);
 
 			GL.ClearColor(new Color4(40, 40, 40, 255));
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
 			basicShader.Bind();
+			GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
 
 			float ratio = (float)Width / Height;
 			Matrix4 projection = Matrix4.CreatePerspectiveOffCenter(-ratio, ratio, -1f, 1f, 1.0f, 40.0f);
-			
+
 			// Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), 16 / 9f, 1.0f, 40.0f);
 
 			const float radius = 10.0f;
@@ -147,6 +158,17 @@ namespace Raymarching
 
 			basicShader.UploadUniformFloat4("u_Color", Color4.CornflowerBlue);
 			GL.DrawArrays(PrimitiveType.Quads, 0, 4);
+
+			basicShader.Unbind();
+			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+			_controller.Update(this, (float)e.Time);
+
+			ImGui.Begin("Debug");
+			ImGui.Text($"FPS: {1 / frameTime:N1}");
+			ImGui.End();
+
+			_controller.Render();
 
 			SwapBuffers();
 		}
