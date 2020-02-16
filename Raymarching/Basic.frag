@@ -131,13 +131,18 @@ vec4 SceneInfo(vec3 position)
     position = mul(position, u_ModelMatrix);
     
     vec3 origin = vec3(0);
-    vec3 size = vec3(1.0,2.0,1.0);
+    vec3 size = vec3(1.0, 1.0, 1.0) * 2.0;
 
+//    float localDst = SphereDistance(position, vec3(0.0), 2.5);
+//    localDst = Combine(localDst, TorusDistance(position, vec3(0.0),1.8,  0.75 ), vec3(0.0),vec3(0.0), 2, 0.5).w;
 
-    float localDst = SphereDistance(position, vec3(0.0), 2.5);
-    localDst = Combine(localDst, TorusDistance(position, vec3(0.0),1.8,  0.75 ), vec3(0.0),vec3(0.0), 2, 0.5).w;
+    const float k = 0.2; // or some other amount
+    float c = cos(k * position.y);
+    float s = sin(k * position.y);
+    mat2  m = mat2(c, -s, s, c);
+    position = vec3(m * position.xz, position.y);
     
-//    float localDst = CubeDistance(eye, origin, size);
+    float localDst = BoxDistance(position, origin, size) * 0.5;
 //    localDst = Combine(localDst, CubeDistance(eye, vec3(0.5,0.0,0.0), vec3(1.0) ), vec3(0.0),vec3(0.0), 3, 0.5).w;
     
     vec3 localColour = vec3(1.0,0.0,0.0);
@@ -182,27 +187,32 @@ void main()
 
     float dst = RayMarch(ray.origin, ray.direction);
 
-    vec3 pointOnSurface = ray.origin + ray.direction * dst;
-
-    vec3 normal = GetNormal(pointOnSurface - ray.direction * EPSILON*2);
-  
-    float total = 0.0;
-    
-    for (int i = 0; i < MAX_LIGHTS; i++)
+    if(dst < MAX_DISTANCE)
     {
-        vec3 lightPos = u_Lights[i].position.xyz;
+        vec3 pointOnSurface = ray.origin + ray.direction * dst;
 
-        if (u_Lights[i].position == vec4(0.0)) continue;
+        vec3 normal = GetNormal(pointOnSurface - ray.direction * EPSILON*2);
 
-        vec3 lightDir = normalize(lightPos - pointOnSurface);
+        float total = 0.0;
 
-        float lighting = clamp(dot(normal, lightDir), 0.0, 1.0);
+        for (int i = 0; i < MAX_LIGHTS; i++)
+        {
+            vec3 lightPos = u_Lights[i].position.xyz;
 
-        float d = RayMarch(pointOnSurface + normal * EPSILON * 20, lightDir);
+            if (u_Lights[i].position == vec4(0.0)) continue;
 
-        if(d < length(lightPos - pointOnSurface)) lighting *= 0;
-        total += lighting;   
+            vec3 lightDir = normalize(lightPos - pointOnSurface);
+
+            float lighting = clamp(dot(normal, lightDir), 0.0, 1.0);
+
+            float d = RayMarch(pointOnSurface + normal * EPSILON * 20, lightDir);
+
+            if(d < length(lightPos - pointOnSurface)) lighting *= 0;
+            total += lighting;
+        }
+        
+        color = vec4(abs(normal), 1.0); // normal mapping
+
+        //    color = vec4(u_Color.xyz * clamp(total, 0.0, 1.0), u_Color.w);
     }
-
-    color = vec4(u_Color.xyz * clamp(total, 0.0, 1.0), u_Color.w);
 }
