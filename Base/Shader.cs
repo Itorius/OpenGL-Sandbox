@@ -8,7 +8,7 @@ namespace Base
 {
 	public class Shader
 	{
-		private readonly int ID;
+		public readonly int ID;
 
 		private static string ReadSource(string path) => File.ReadAllText(path) + "\r\n";
 
