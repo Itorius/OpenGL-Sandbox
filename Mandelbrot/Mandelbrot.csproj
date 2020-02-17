@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="OpenTK" Version="3.1.0" />
+	  <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -15,13 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Exclude="bin/**" Include="**\*.frag">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Exclude="bin/**" Include="**\*.vert">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Exclude="bin/**" Include="**\*.geom">
+		<Content Include="Assets\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
