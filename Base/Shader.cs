@@ -15,7 +15,7 @@ namespace Base
 		public Shader(string vertexPath, string fragmentPath, string geometryPath = null)
 		{
 			#region Vertex
-			string vertexSource = ReadSource(vertexPath);
+			string vertexSource = ReadSource(vertexPath) + "\r\n";
 
 			int vertex = GL.CreateShader(ShaderType.VertexShader);
 			GL.ShaderSource(vertex, vertexSource);
@@ -32,7 +32,7 @@ namespace Base
 			#endregion
 
 			#region Fragment
-			string fragmentSource = ReadSource(fragmentPath);
+			string fragmentSource = ReadSource(fragmentPath) + "\r\n";
 
 			int fragment = GL.CreateShader(ShaderType.FragmentShader);
 			GL.ShaderSource(fragment, fragmentSource);
@@ -52,7 +52,7 @@ namespace Base
 			int? geo = null;
 			if (!string.IsNullOrWhiteSpace(geometryPath))
 			{
-				string geoSource = ReadSource(geometryPath);
+				string geoSource = ReadSource(geometryPath) + "\r\n";
 
 				geo = GL.CreateShader(ShaderType.GeometryShader);
 				GL.ShaderSource(geo.Value, geoSource);

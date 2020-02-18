@@ -1,4 +1,6 @@
 ﻿using Base;
+using Dear_ImGui_Sample;
+using ImGuiNET;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -12,6 +14,7 @@ namespace Mandelbrot
 		private Shader shader;
 		private const double smoothing = 0.9;
 		private double frameTime;
+		private ImGuiController ImGuiController;
 
 		public Game(int width = 1280, int height = 720, string title = "Game") : base(width, height, GraphicsMode.Default, title)
 		{
@@ -20,15 +23,20 @@ namespace Mandelbrot
 		protected override void OnResize(EventArgs e)
 		{
 			GL.Viewport(0, 0, Width, Height);
+
+			ImGuiController.WindowResized(Width, Height);
 		}
 
 		private Texture1D texture;
+
 		protected override unsafe void OnLoad(EventArgs e)
 		{
-			shader = new Shader("Assets/basic.vert", "Assets/basic.frag");
+			ImGuiController = new ImGuiController(Width, Height);
+
+			shader = new Shader("Assets/basic.vert", "Assets/Mandelbrot_Dist.frag");
 
 			texture = new Texture1D("Assets/gradient.png");
-			
+
 			GL.GenBuffers(1, out int quad);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, quad);
 
@@ -52,14 +60,20 @@ namespace Mandelbrot
 		private int timer;
 		private int max_iterations;
 
+		private float gameTime;
+
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
+			gameTime += (float)e.Time;
+
 			if (++timer > 10)
 			{
 				if (++max_iterations > 100) max_iterations = 0;
 
 				timer = 0;
 			}
+
+			if (!Focused) return;
 
 			var state = Keyboard.GetState();
 			if (state.IsKeyDown(Key.KeypadPlus)) scale *= 0.99f;
@@ -87,6 +101,10 @@ namespace Mandelbrot
 		private Vector2 position;
 		private float rotation;
 
+		private float radius = 20f;
+		private float repeat = 10f;
+		private Vector2 pivot = Vector2.Zero;
+
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			frameTime = frameTime * smoothing + e.Time * (1.0 - smoothing);
@@ -106,8 +124,42 @@ namespace Mandelbrot
 			shader.UploadUniformInt("u_MaxIterations", 255);
 			shader.UploadUniformFloat4("u_Area", new Vector4(position.X, position.Y, scaleX, scaleY));
 			shader.UploadUniformFloat("u_Angle", rotation);
+			shader.UploadUniformFloat("u_Time", gameTime);
+
+			shader.UploadUniformFloat("u_Radius", radius);
+			shader.UploadUniformFloat("u_Repeat", repeat);
+			shader.UploadUniformFloat2("u_Pivot", pivot);
 
 			GL.DrawArrays(PrimitiveType.Quads, 0, 4);
+
+			ImGuiController.Update(this, (float)e.Time);
+
+			ImGui.Begin("Debug");
+			ImGui.Text($"FPS: {1 / frameTime:N1}");
+			ImGui.Text("Zoom: " + scale);
+
+			ImGui.Separator();
+
+			ImGui.SliderFloat("Radius", ref radius, 2f, 50f);
+			ImGui.SliderFloat("Repeat", ref repeat, 0.1f, 20f);
+
+			ImGui.SliderFloat2("Pivot", ref pivot, 0.1f, 20f);
+
+			bool pressed = ImGui.Button("Reset");
+			if (pressed)
+			{
+				radius = 20f;
+				repeat = 10f;
+				pivot = Vector2.Zero;
+
+				position = Vector2.Zero;
+				scale = 4f;
+				rotation = 0f;
+			}
+
+			ImGui.End();
+
+			ImGuiController.Render();
 
 			SwapBuffers();
 		}

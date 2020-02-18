@@ -1,4 +1,4 @@
-#version 440 core
+﻿#version 440 core
 
 layout(location = 0) out vec4 color;
 
@@ -27,25 +27,19 @@ vec2 rotate(vec2 point, vec2 pivot, float angle)
 	return point;
 }
 
-uniform float u_Radius;
-uniform vec2 u_Pivot;
-uniform float u_Repeat;
-
 void main()
 {
-	vec2 z, zPrev;
+	vec2 z = vec2(0.0, 0.0);
 	vec2 uv = v_Position;
 	uv = u_Area.xy + (uv - 0.5) * u_Area.zw;
 	uv = rotate(uv, u_Area.xy, u_Angle);
 
-	float radius = u_Radius;
-	float radius2 = radius * radius;
-	
+	float radius = 20.0;
+
 	float iterations = 0.0;
-	while (dot(z, zPrev) < radius2 && iterations < u_MaxIterations)
+	while (length(z) < radius && iterations < u_MaxIterations)
 	{
-		zPrev = rotate(z, u_Pivot, u_Time);
-		z = product(z, z) + uv;
+		z =product(z,z) + uv;
 
 		iterations++;
 	}
@@ -55,16 +49,12 @@ void main()
 	{
 		float dist = length(z);
 
-		float i = (dist - radius) / (radius2 - radius);
+		float i = (dist - radius) / (radius * radius - radius);
 		i = log2(log(dist) / log(radius));
+		
+		iterations -= i;
 
-		float angle = atan(z.x, z.y);
-		
 		float m = sqrt(iterations / u_MaxIterations);
-		color = texture(texGradient, m * u_Repeat + u_Time * 0.25);
-		
-		color *= smoothstep(3.0, 0.0, i);
-		color *= 1.0 + sin(angle * 2.0 + u_Time * 4.0) * 0.2;
-		
+		color = texture(texGradient, m * 10.0 + u_Time*0.25);
 	}
 }

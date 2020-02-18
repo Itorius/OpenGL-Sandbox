@@ -18,13 +18,7 @@
 
 
 	<ItemGroup>
-		<Content Exclude="bin/**" Include="**\*.frag">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Exclude="bin/**" Include="**\*.vert">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Exclude="bin/**" Include="**\*.geom">
+		<Content Include="Assets\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

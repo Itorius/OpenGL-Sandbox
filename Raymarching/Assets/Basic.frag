@@ -1,4 +1,4 @@
-﻿﻿#version 440 core
+﻿#version 440 core
 
 const int MAX_LIGHTS = 16;
 const float MAX_DISTANCE = 150.0;
@@ -12,6 +12,7 @@ uniform vec4 u_Color;
 uniform mat4 u_CameraToWorld;
 uniform mat4 u_CameraInverseProjection;
 uniform mat4 u_ModelMatrix;
+uniform float u_Time;
 
 struct Light {
     vec4 position;
@@ -126,23 +127,43 @@ vec4 Combine(float dstA, float dstB, vec3 colourA, vec3 colourB, int operation, 
 
 vec4 SceneInfo(vec3 position)
 {
+    float plane = position.y + 2.0;
+    plane = 1000.0;
+    
     float globalDst = MAX_DISTANCE;
     vec3 globalColour = vec3(1.0);
     position = mul(position, u_ModelMatrix);
+
+    vec3 c = vec3(1.0, 1.0, 1.0) * 10.0;
+    position = mod(position+0.5*c,c)-0.5*c;
     
-    vec3 origin = vec3(0);
-    vec3 size = vec3(1.0, 1.0, 1.0) * 2.0;
+
+//    const float k = 0.4;
+//    float c = cos(k * torusPos.z);
+//    float s = sin(k * torusPos.z);
+//    mat2  m = mat2(c, -s, s, c);
+//    torusPos = vec3(m * torusPos.xy, torusPos.z);
+    
+    float torus = TorusDistance(position, vec3(0.0), 0.8,  0.05);
+    
+    float sphere = SphereDistance(position, vec3(0.0), 1.0);
+    float box = BoxDistance(position, vec3(0.0), vec3(1.0));
+
+    float localDst = min(plane, mix(torus, sphere, sin(u_Time*1.5)*0.5+0.5));
+    
+//    vec3 origin = vec3(0);
+//    vec3 size = vec3(1.0, 1.0, 1.0) * 2.0;
 
 //    float localDst = SphereDistance(position, vec3(0.0), 2.5);
 //    localDst = Combine(localDst, TorusDistance(position, vec3(0.0),1.8,  0.75 ), vec3(0.0),vec3(0.0), 2, 0.5).w;
 
-    const float k = 0.2; // or some other amount
-    float c = cos(k * position.y);
-    float s = sin(k * position.y);
-    mat2  m = mat2(c, -s, s, c);
-    position = vec3(m * position.xz, position.y);
-    
-    float localDst = BoxDistance(position, origin, size) * 0.5;
+//    const float k = 0.2; // or some other amount
+//    float c = cos(k * position.y);
+//    float s = sin(k * position.y);
+//    mat2  m = mat2(c, -s, s, c);
+//    position = vec3(m * position.xz, position.y);
+//    
+//    float localDst = BoxDistance(position, origin, size) * 0.5;
 //    localDst = Combine(localDst, CubeDistance(eye, vec3(0.5,0.0,0.0), vec3(1.0) ), vec3(0.0),vec3(0.0), 3, 0.5).w;
     
     vec3 localColour = vec3(1.0,0.0,0.0);
@@ -205,14 +226,14 @@ void main()
 
             float lighting = clamp(dot(normal, lightDir), 0.0, 1.0);
 
-            float d = RayMarch(pointOnSurface + normal * EPSILON * 20, lightDir);
+            float d = RayMarch(pointOnSurface + normal * EPSILON*5, lightDir);
 
-            if(d < length(lightPos - pointOnSurface)) lighting *= 0;
+            if(d < length(lightPos - pointOnSurface)) lighting *= 0.1;
             total += lighting;
         }
         
         color = vec4(abs(normal), 1.0); // normal mapping
-
-        //    color = vec4(u_Color.xyz * clamp(total, 0.0, 1.0), u_Color.w);
+        
+//        color = vec4(u_Color.xyz * clamp(total, 0.0, 1.0), u_Color.w);
     }
 }

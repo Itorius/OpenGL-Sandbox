@@ -187,10 +187,9 @@ void main()
 		private void SetPerFrameImGuiData(float deltaSeconds)
 		{
 			ImGuiIOPtr io = ImGui.GetIO();
-			io.DisplaySize = new System.Numerics.Vector2(
-				_windowWidth / _scaleFactor.X,
-				_windowHeight / _scaleFactor.Y);
-			io.DisplayFramebufferScale = _scaleFactor;
+			io.DisplaySize = new Vector2(_windowWidth / _scaleFactor.X, _windowHeight / _scaleFactor.Y);
+			io.DisplayFramebufferScale.X = _scaleFactor.X;
+			io.DisplayFramebufferScale.Y = _scaleFactor.Y;
 			io.DeltaTime = deltaSeconds; // DeltaTime is in seconds.
 		}
 
@@ -211,7 +210,7 @@ void main()
 
 			var screenPoint = new System.Drawing.Point(MouseState.X, MouseState.Y);
 			var point = wnd.PointToClient(screenPoint);
-			io.MousePos = new System.Numerics.Vector2(point.X, point.Y);
+			io.MousePos = new Vector2(point.X, point.Y);
 
 			io.MouseWheel = MouseState.Scroll.Y - PrevMouseState.Scroll.Y;
 			io.MouseWheelH = MouseState.Scroll.X - PrevMouseState.Scroll.X;
