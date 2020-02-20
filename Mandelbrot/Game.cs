@@ -33,7 +33,7 @@ namespace Mandelbrot
 		{
 			ImGuiController = new ImGuiController(Width, Height);
 
-			shader = new Shader("Assets/basic.vert", "Assets/Mandelbrot_Dist.frag");
+			shader = new Shader("Assets/basic.vert", "Assets/basic.frag");
 
 			texture = new Texture1D("Assets/gradient.png");
 
