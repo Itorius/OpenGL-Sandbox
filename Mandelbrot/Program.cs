@@ -6,11 +6,11 @@ namespace Mandelbrot
 	{
 		private static void Main(string[] args)
 		{
-			using Game game = new Game
-			{
-				VSync = VSyncMode.On
-			};
-			game.Run(60);
+			// using Game game = new Game
+			// {
+			// 	VSync = VSyncMode.On
+			// };
+			// game.Run(60);
 		}
 	}
 }

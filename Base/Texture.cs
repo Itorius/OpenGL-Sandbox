@@ -26,8 +26,7 @@ namespace Base
 				pixels.Add(p.A);
 			}
 
-			GL.GenTextures(1, out ID);
-			GL.BindTexture(TextureTarget.Texture1D, ID);
+			GL.CreateTextures(TextureTarget.Texture1D, 1, out ID);
 
 			GL.TextureStorage1D(ID, 1, SizedInternalFormat.Rgba8, image.Width);
 
@@ -59,8 +58,7 @@ namespace Base
 				pixels.Add(p.A);
 			}
 
-			GL.GenTextures(1, out ID);
-			GL.BindTexture(TextureTarget.Texture2D, ID);
+			GL.CreateTextures(TextureTarget.Texture2D, 1, out ID);
 
 			GL.TextureStorage2D(ID, 1, SizedInternalFormat.Rgba8, image.Width, image.Height);
 

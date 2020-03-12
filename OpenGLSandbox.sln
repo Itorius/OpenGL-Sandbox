@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mandelbrot", "Mandelbrot\Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raymarching", "Raymarching\Raymarching.csproj", "{FDAFCB39-2259-4D1E-80B1-91386D12DB71}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raytracer", "Raytracer\Raytracer.csproj", "{57B02326-8A7B-4F02-B138-CC44A6C2B981}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentPipeline", "ContentPipeline\ContentPipeline.csproj", "{622EFEB5-BFCB-480A-B593-FE89C1441825}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{FDAFCB39-2259-4D1E-80B1-91386D12DB71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDAFCB39-2259-4D1E-80B1-91386D12DB71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDAFCB39-2259-4D1E-80B1-91386D12DB71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57B02326-8A7B-4F02-B138-CC44A6C2B981}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57B02326-8A7B-4F02-B138-CC44A6C2B981}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57B02326-8A7B-4F02-B138-CC44A6C2B981}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57B02326-8A7B-4F02-B138-CC44A6C2B981}.Release|Any CPU.Build.0 = Release|Any CPU
+		{622EFEB5-BFCB-480A-B593-FE89C1441825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{622EFEB5-BFCB-480A-B593-FE89C1441825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{622EFEB5-BFCB-480A-B593-FE89C1441825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{622EFEB5-BFCB-480A-B593-FE89C1441825}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

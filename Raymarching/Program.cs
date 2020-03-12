@@ -6,11 +6,11 @@ namespace Raymarching
 	{
 		private static void Main(string[] args)
 		{
-			using Game game = new Game
-			{
-				VSync = VSyncMode.On, TargetRenderFrequency = 120.0
-			};
-			game.Run(60);
+			// using Game game = new Game
+			// {
+			// 	VSync = VSyncMode.On
+			// };
+			// game.Run(60);
 		}
 	}
 }

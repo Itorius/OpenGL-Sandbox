@@ -129,46 +129,54 @@ vec4 Combine(float dstA, float dstB, vec3 colourA, vec3 colourB, int operation, 
 	return vec4(colour,dst);
 }
 
+float Mandelbulb(in vec3 p, out vec4 color)
+{
+	vec3 w = p;
+	float m = dot(w, w);
+
+	vec4 trap = vec4(abs(w), m);
+	float dz = 1.0;
+
+	for(int i = 0; i < 4; i++)
+	{
+		float m2 = m * m;
+		float m4 = m2 * m2;
+		dz = 8.0 * sqrt(m4 * m2 * m) * dz + 1.0;
+
+		float x = w.x; float x2 = x * x; float x4 = x2 * x2;
+		float y = w.y; float y2 = y * y; float y4 = y2 * y2;
+		float z = w.z; float z2 = z * z; float z4 = z2 * z2;
+
+		float k3 = x2 + z2;
+		float k2 = inversesqrt(k3 * k3 * k3 * k3 * k3 * k3 * k3);
+		float k1 = x4 + y4 + z4 - 6.0 * y2 * z2 - 6.0 * x2 * y2 + 2.0 *  z2 * x2;
+		float k4 = x2 - y2 + z2;
+
+		w.x = p.x +  64.0 * x* y * z * (x2 - z2) * k4 * (x4 - 6.0 * x2 * z2 + z4) * k1 * k2;
+		w.y = p.y + -16.0 * y2 * k3 * k4 * k4 + k1 * k1;
+		w.z = p.z + -8.0 * y * k4 * (x4 * x4 - 28.0 * x4 * x2 * z2 + 70.0 * x4 * z4 - 28.0 * x2 * z2 * z4 + z4 * z4) * k1 * k2;
+		
+		trap = min(trap, vec4(abs(w), m));
+
+		m = dot(w, w);
+		if(m > 256.0) break;
+	}
+
+	color = vec4(m, trap.yzw);
+
+	return 0.25 * log(m) * sqrt(m) / dz;
+}
+
 vec4 SceneInfo(vec3 position)
 {
 	float plane = position.y;
 
 	float globalDst = MAX_DISTANCE;
 	vec3 globalColour = vec3(1.0);
-
-	float c = 5.0;
-	vec3 l = vec3(1, 0, 1);
-	vec3 diff = c * clamp(round(position / c), -l, l);
-
-	position = position - diff;
-
-	position = mul(position, u_ModelMatrix);
-
-	float box = BoxDistance(position, vec3(0.0), vec3(1.0));
-	float sphere = SphereDistance(position, vec3(0.0), 0.8);
-	float torus = TorusDistance(position, vec3(0.0), 1.4, 0.3);
-
-	//	float localDst =  mix(torus, sphere, sin(u_Time*1.5)*0.5+0.5);
-
-//	float localDst = min(plane, max(box, -sphere)*0.5);
-	float localDst = min(plane, min(sphere, torus) * 0.75);
-	localDst = min(plane, box);
 	
-	//    vec3 origin = vec3(0);
-	//    vec3 size = vec3(1.0, 1.0, 1.0) * 2.0;
-
-	//    float localDst = SphereDistance(position, vec3(0.0), 2.5);
-	//    localDst = Combine(localDst, TorusDistance(position, vec3(0.0),1.8,  0.75 ), vec3(0.0),vec3(0.0), 2, 0.5).w;
-
-	//    const float k = 0.2; // or some other amount
-	//    float c = cos(k * position.y);
-	//    float s = sin(k * position.y);
-	//    mat2  m = mat2(c, -s, s, c);
-	//    position = vec3(m * position.xz, position.y);
-	//    
-	//    float localDst = BoxDistance(position, origin, size) * 0.5;
-	//    localDst = Combine(localDst, CubeDistance(eye, vec3(0.5,0.0,0.0), vec3(1.0) ), vec3(0.0),vec3(0.0), 3, 0.5).w;
-
+	vec4 color;
+	float localDst = Mandelbulb(position, color);
+	
 	vec3 localColour = vec3(1.0,0.0,0.0);
 
 	globalColour = localColour.xyz;
