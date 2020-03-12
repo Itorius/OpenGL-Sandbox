@@ -27,6 +27,7 @@ namespace Base
 		{
 			public Shader Shader;
 			public Matrix4 ViewProjection;
+			public MultisampleFramebuffer Framebuffer;
 		}
 
 		private static SceneData scene;
@@ -37,9 +38,9 @@ namespace Base
 			Quads.SetVertices(ref Vertices);
 			Quads.SetIndices(ref Indices);
 
-			fontShader = new Shader("Assets/font.vert", "Assets/font.frag");
+			fontShader = new Shader("Assets/Shaders/Font.vert", "Assets/Shaders/Font.frag");
 
-			string[] files = Directory.GetFiles(@"G:\C#\OpenGLSandbox\ContentPipeline\bin\Debug\netcoreapp3.1\out\");
+			string[] files = Directory.GetFiles(@"Assets/Font");
 
 			GL.GenTextures(1, out fontTexture);
 			GL.BindTexture(TextureTarget.Texture2DArray, fontTexture);
@@ -76,10 +77,13 @@ namespace Base
 			}
 		}
 
-		public static void BeginScene(Matrix4 camera, Shader shader)
+		public static void BeginScene(Matrix4 camera, Shader shader, MultisampleFramebuffer framebuffer = null)
 		{
 			scene.Shader = shader;
 			scene.ViewProjection = camera;
+			scene.Framebuffer = framebuffer;
+
+			framebuffer?.Bind();
 
 			shader.Bind();
 			shader.UploadUniformMat4("u_ViewProjection", camera);
@@ -92,6 +96,7 @@ namespace Base
 			Flush();
 
 			scene.Shader.Unbind();
+			scene.Framebuffer?.Unbind();
 
 			Quads.Unbind();
 		}
@@ -207,6 +212,8 @@ namespace Base
 		public static void Flush()
 		{
 			if (quad <= 0) return;
+
+			Quads.Bind();
 
 			Quads.SetVertices(ref Vertices);
 			Quads.SetIndices(ref Indices);
