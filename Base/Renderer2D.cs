@@ -25,9 +25,9 @@ namespace Base
 
 		private struct SceneData
 		{
-			public Shader Shader;
-			public Matrix4 ViewProjection;
-			public MultisampleFramebuffer Framebuffer;
+			public Shader shader;
+			public Camera camera;
+			public MultisampleFramebuffer framebuffer;
 		}
 
 		private static SceneData scene;
@@ -77,18 +77,18 @@ namespace Base
 			}
 		}
 
-		public static void BeginScene(Matrix4 camera, Shader shader, MultisampleFramebuffer framebuffer = null)
+		public static void BeginScene(Camera camera, Shader shader, MultisampleFramebuffer framebuffer = null)
 		{
 			begun = true;
 
-			scene.Shader = shader;
-			scene.ViewProjection = camera;
-			scene.Framebuffer = framebuffer;
+			scene.shader = shader;
+			scene.camera = camera;
+			scene.framebuffer = framebuffer;
 
 			framebuffer?.Bind();
 
 			shader.Bind();
-			shader.UploadUniformMat4("u_ViewProjection", camera);
+			shader.UploadUniformMat4("u_ViewProjection", camera.ViewProjection);
 
 			Quads.Bind();
 		}
@@ -99,8 +99,8 @@ namespace Base
 
 			Flush();
 
-			scene.Shader.Unbind();
-			scene.Framebuffer?.Unbind();
+			scene.shader.Unbind();
+			scene.framebuffer?.Unbind();
 
 			Quads.Unbind();
 		}
@@ -207,7 +207,7 @@ namespace Base
 			var data = scene;
 			EndScene();
 
-			BeginScene(data.ViewProjection, fontShader);
+			BeginScene(data.camera, fontShader);
 			fontShader.UploadUniformFloat2("u_ViewportSize", new Vector2(BaseWindow.Instance.Width, BaseWindow.Instance.Height));
 
 			GL.BindTexture(TextureTarget.Texture2DArray, fontTexture);
@@ -249,7 +249,7 @@ namespace Base
 
 			EndScene();
 
-			BeginScene(data.ViewProjection, data.Shader);
+			BeginScene(data.camera, data.shader);
 
 			return new Vector2(width, height);
 		}
