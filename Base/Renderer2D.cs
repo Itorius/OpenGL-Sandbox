@@ -79,6 +79,8 @@ namespace Base
 
 		public static void BeginScene(Matrix4 camera, Shader shader, MultisampleFramebuffer framebuffer = null)
 		{
+			begun = true;
+
 			scene.Shader = shader;
 			scene.ViewProjection = camera;
 			scene.Framebuffer = framebuffer;
@@ -93,6 +95,8 @@ namespace Base
 
 		public static void EndScene()
 		{
+			begun = false;
+
 			Flush();
 
 			scene.Shader.Unbind();
@@ -104,6 +108,7 @@ namespace Base
 		private static int quad;
 		private static int index;
 		private static uint vertex;
+		private static bool begun;
 
 		public static void DrawMesh(ref Mesh mesh)
 		{
@@ -123,10 +128,10 @@ namespace Base
 
 			Matrix4 m = Matrix4.CreateScale(size.X, size.Y, 1f) * Matrix4.CreateFromQuaternion(rotation.Value) * Matrix4.CreateTranslation(position.X, position.Y, 0f);
 
-			Vertices[vertex] = new Vertex((new Vector4(-0.5f, 0.5f, 0f, 1f) * m).Xyz, new Vector3(0f, 1f, texture), color.Value);
-			Vertices[vertex + 1] = new Vertex((new Vector4(0.5f, 0.5f, 0f, 1f) * m).Xyz, new Vector3(1f, 1f, texture), color.Value);
-			Vertices[vertex + 2] = new Vertex((new Vector4(0.5f, -0.5f, 0f, 1f) * m).Xyz, new Vector3(1f, 0f, texture), color.Value);
-			Vertices[vertex + 3] = new Vertex((new Vector4(-0.5f, -0.5f, 0f, 1f) * m).Xyz, new Vector3(0f, 0f, texture), color.Value);
+			Vertices[vertex] = new Vertex((new Vector4(-0.5f, 0.5f, 0f, 1f) * m).Xyz, new Vector3(0f, 0f, texture), color.Value);
+			Vertices[vertex + 1] = new Vertex((new Vector4(0.5f, 0.5f, 0f, 1f) * m).Xyz, new Vector3(1f, 0f, texture), color.Value);
+			Vertices[vertex + 2] = new Vertex((new Vector4(0.5f, -0.5f, 0f, 1f) * m).Xyz, new Vector3(1f, 1f, texture), color.Value);
+			Vertices[vertex + 3] = new Vertex((new Vector4(-0.5f, -0.5f, 0f, 1f) * m).Xyz, new Vector3(0f, 1f, texture), color.Value);
 
 			Indices[index] = vertex;
 			Indices[index + 1] = vertex + 1;
@@ -140,6 +145,34 @@ namespace Base
 
 			quad++;
 		}
+
+		public static void DrawQuadTL(Vector2 position, Vector2 size, Color4? color = null, Quaternion? rotation = null, float texture = 0f)
+		{
+			if (quad >= QuadCount) Flush();
+
+			rotation ??= Quaternion.Identity;
+			color ??= Color4.White;
+
+			Matrix4 m = Matrix4.CreateScale(size.X, size.Y, 1f) * Matrix4.CreateFromQuaternion(rotation.Value) * Matrix4.CreateTranslation(position.X, position.Y, 0f);
+
+			Vertices[vertex] = new Vertex((new Vector4(0f, 0f, 0f, 1f) * m).Xyz, new Vector3(0f, 1f, texture), color.Value);
+			Vertices[vertex + 1] = new Vertex((new Vector4(1f, 0f, 0f, 1f) * m).Xyz, new Vector3(1f, 1f, texture), color.Value);
+			Vertices[vertex + 2] = new Vertex((new Vector4(1f, 1f, 0f, 1f) * m).Xyz, new Vector3(1f, 0f, texture), color.Value);
+			Vertices[vertex + 3] = new Vertex((new Vector4(0f, 1f, 0f, 1f) * m).Xyz, new Vector3(0f, 0f, texture), color.Value);
+
+			Indices[index] = vertex;
+			Indices[index + 1] = vertex + 1;
+			Indices[index + 2] = vertex + 2;
+			Indices[index + 3] = vertex + 2;
+			Indices[index + 4] = vertex + 3;
+			Indices[index + 5] = vertex + 0;
+
+			vertex += 4;
+			index += 6;
+
+			quad++;
+		}
+
 
 		public static void DrawLine(Vector2 start, Vector2 end, Color4? color = null, float width = 2f)
 		{
@@ -169,7 +202,7 @@ namespace Base
 			quad++;
 		}
 
-		public static void DrawString(string text, float x, float y, Color4? color = null, float scale = 1f)
+		public static Vector2 DrawString(string text, float x, float y, Color4? color = null, float scale = 1f)
 		{
 			var data = scene;
 			EndScene();
@@ -182,31 +215,43 @@ namespace Base
 
 			color ??= Color4.White;
 
+			float origX = x;
+
+			float width = 0f;
+			float row = (glyphs.Max(glyph => glyph.Size.Y) + 5f) * scale;
+			float height = row;
+
 			foreach (char c in text)
 			{
 				Glyph glyph = glyphs[c];
 
 				if (c == '\n')
 				{
-					y -= (glyphs.Max(glyph => glyph.Size.Y) + 5f) * scale;
-					x = -500f;
+					y -= row;
+					height += row;
+
+					x = origX;
 					continue;
 				}
 
 				if (c != ' ')
 				{
 					float xpos = x;
-					float ypos = y - MathF.Min(0, (glyph.Size.Y - glyph.Bearing.Y) * scale);
+					float ypos = y - MathF.Min(0, (glyph.Size.Y - glyph.Bearing.Y) * scale) - 10f;
 
-					DrawQuad(new Vector2(xpos, ypos), new Vector2(64f) * scale, color, texture: glyph.TextureSlot);
+
+					DrawQuadTL(new Vector2(xpos - 10f * scale, ypos - 10f * scale), new Vector2(64f) * scale, color, texture: glyph.TextureSlot);
 				}
 
 				x += glyph.Advance * scale;
+				width += glyph.Size.X * scale * 0.5f + glyph.Advance * scale * 0.5f;
 			}
 
 			EndScene();
 
 			BeginScene(data.ViewProjection, data.Shader);
+
+			return new Vector2(width, height);
 		}
 
 		public static void Flush()

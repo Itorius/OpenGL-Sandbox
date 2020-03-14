@@ -7,8 +7,15 @@ namespace Base
 {
 	public class ImGuiLayer : Layer
 	{
+		internal static ImGuiLayer Instance;
+		
 		private ImGuiController ImGuiController;
 
+		public ImGuiLayer()
+		{
+			Instance = this;
+		}
+		
 		public override void OnAttach()
 		{
 			ImGuiController = new ImGuiController(1280, 720);

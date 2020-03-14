@@ -3,8 +3,6 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Base
 {
@@ -12,26 +10,14 @@ namespace Base
 	{
 		public static BaseWindow Instance;
 
-		internal static Version OpenGLVersion;
-		internal static List<string> Extensions;
-
-		protected LayerStack Layers;
+		protected readonly LayerStack Layers;
 
 		public BaseWindow(int width = 1280, int height = 720, string title = "Game") : base(width, height, GraphicsMode.Default, title)
 		{
 			Instance = this;
 
-			GL.GetInteger(GetPName.MajorVersion, out int major);
-			GL.GetInteger(GetPName.MinorVersion, out int minor);
-			OpenGLVersion = new Version(major, minor);
-
-			Extensions = GL.GetString(StringName.Extensions).Split(' ').ToList();
-
 			Layers = new LayerStack();
 		}
-
-		private const double smoothing = 0.9;
-		protected double frameTime;
 
 		protected override void OnResize(EventArgs e)
 		{
@@ -40,8 +26,12 @@ namespace Base
 			foreach (Layer layer in Layers) layer.OnWindowResize(Width, Height);
 		}
 
+		private Vector2 mouse;
+
 		protected override void OnMouseMove(MouseMoveEventArgs e)
 		{
+			mouse = new Vector2(e.X, e.Y);
+
 			foreach (Layer layer in Layers) layer.OnMouseMove(e);
 		}
 
@@ -59,6 +49,15 @@ namespace Base
 			foreach (Layer layer in Layers)
 			{
 				bool handled = layer.OnMouseUp(e);
+				if (handled) break;
+			}
+		}
+
+		protected override void OnMouseWheel(MouseWheelEventArgs e)
+		{
+			foreach (Layer layer in Layers)
+			{
+				bool handled = layer.OnMouseScroll(e);
 				if (handled) break;
 			}
 		}
@@ -88,15 +87,15 @@ namespace Base
 
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
+			if (WindowState == WindowState.Minimized) return;
+			
 			GL.ClearColor(0.175f, 0.175f, 0.175f, 1f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
-
-			frameTime = frameTime * smoothing + e.Time * (1.0 - smoothing);
 
 			Time.DeltaDrawTime = (float)e.Time;
 			Time.TotalDrawTime += Time.DeltaDrawTime;
 
-			(Layers.FirstOrDefault(x => x is ImGuiLayer) as ImGuiLayer)?.Begin();
+			ImGuiLayer.Instance?.Begin();
 
 			foreach (Layer layer in Layers) layer.OnGUI();
 

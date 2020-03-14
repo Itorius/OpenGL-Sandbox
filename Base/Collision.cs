@@ -26,10 +26,16 @@ namespace Base
 	public struct Polygon
 	{
 		public readonly Line[] lines;
+		public readonly Vector2[] vertices;
 
 		public Polygon(Vector2 position, Vector2 size)
 		{
 			(float width, float height) = size;
+
+			vertices = new[]
+			{
+				position, new Vector2(position.X + width, position.Y), new Vector2(position.X + width, position.Y + height), new Vector2(position.X, position.Y + height)
+			};
 
 			lines = new[]
 			{
@@ -104,7 +110,7 @@ namespace Base
 			intersections = list;
 			return list.Count > 0;
 		}
-		
+
 		public static bool LinePolygon(Line line, Polygon rectangle, out IEnumerable<(Line, Vector2)> intersections)
 		{
 			List<(Line, Vector2)> list = new List<(Line, Vector2)>();
@@ -116,6 +122,28 @@ namespace Base
 
 			intersections = list;
 			return list.Count > 0;
+		}
+
+		public static bool PointPolygon(Polygon polygon, Vector2 point)
+		{
+			bool collision = false;
+			(float x, float y) = point;
+
+			for (int current = 0; current < polygon.vertices.Length; current++)
+			{
+				var next = current + 1;
+				if (next == polygon.vertices.Length) next = 0;
+
+				(float cX, float cY) = polygon.vertices[current];
+				(float nX, float nY) = polygon.vertices[next];
+
+				if ((cY >= y && nY < y || cY < y && nY >= y) && x < (nX - cX) * (y - cY) / (nY - cY) + cX)
+				{
+					collision = !collision;
+				}
+			}
+
+			return collision;
 		}
 	}
 }

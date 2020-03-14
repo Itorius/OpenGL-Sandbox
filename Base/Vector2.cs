@@ -297,7 +297,7 @@ namespace Base
 			return (float)(left.X * (double)right.Y - left.Y * (double)right.X);
 		}
 
-		public static float SignedAngle(Vector2 a, Vector2 b) => MathF.Atan2(Base.Vector2.PerpDot(a, b), Base.Vector2.Dot(a, b));
+		public static float SignedAngle(Vector2 a, Vector2 b) => MathF.Atan2(PerpDot(a, b), Dot(a, b));
 
 		public static void PerpDot(ref Vector2 left, ref Vector2 right, out float result)
 		{
@@ -356,9 +356,9 @@ namespace Base
 		{
 			float dot = Dot(a, b);
 			float l = a.Length * b.Length;
-			return MathF.Acos(dot/l);
+			return MathF.Acos(dot / l);
 		}
-		
+
 		[XmlIgnore]
 		public Vector2 Yx
 		{
