@@ -8,20 +8,17 @@ namespace Base
 {
 	public abstract class BaseWindow : GameWindow
 	{
-		public static BaseWindow Instance;
-
 		protected readonly LayerStack Layers;
 
 		public BaseWindow(int width = 1280, int height = 720, string title = "Game") : base(width, height, GraphicsMode.Default, title)
 		{
-			Instance = this;
-
 			Layers = new LayerStack();
 		}
 
 		protected override void OnResize(EventArgs e)
 		{
 			GL.Viewport(0, 0, Width, Height);
+			Renderer2D.Viewport = new Vector2(Width, Height);
 
 			foreach (Layer layer in Layers) layer.OnWindowResize(Width, Height);
 		}
@@ -88,7 +85,7 @@ namespace Base
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			if (WindowState == WindowState.Minimized) return;
-			
+
 			GL.ClearColor(0.175f, 0.175f, 0.175f, 1f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 

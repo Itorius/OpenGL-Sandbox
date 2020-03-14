@@ -8,7 +8,7 @@ namespace Base
 	public class MultisampleFramebuffer
 	{
 		private int samples;
-		
+
 		private int framebuffer;
 		private int renderbuffer;
 		private int texture;
@@ -18,7 +18,7 @@ namespace Base
 		public MultisampleFramebuffer(int width, int height, int samples = 4)
 		{
 			this.samples = samples;
-			
+
 			GL.GenFramebuffers(1, out framebuffer);
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 
@@ -87,6 +87,12 @@ namespace Base
 		{
 			GL.BindTexture(TextureTarget.Texture2DMultisample, texture);
 			GL.ActiveTexture(TextureUnit.Texture0);
+		}
+
+		public void Clear(Color? color = null)
+		{
+			if (color != null) GL.ClearColor((Color4)color);
+			GL.Clear(ClearBufferMask.ColorBufferBit);
 		}
 	}
 }

@@ -448,5 +448,7 @@ namespace Base
 		{
 			return X == (double)other.X && Y == (double)other.Y;
 		}
+
+		public static Vector2 Transform(Vector2 vector, Matrix4 matrix) => new Vector2(vector.X + matrix.Row3.X, vector.Y - matrix.Row3.Y);
 	}
 }

@@ -5,6 +5,7 @@ using Raytracer;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 
 namespace Base
 {
@@ -13,6 +14,8 @@ namespace Base
 		private const int QuadCount = 10000;
 		private const int VertexCount = QuadCount * 4;
 		private const int IndexCount = QuadCount * 6;
+
+		internal static Vector2 Viewport;
 
 		private static Vertex[] Vertices = new Vertex[VertexCount];
 		private static uint[] Indices = new uint[IndexCount];
@@ -173,7 +176,6 @@ namespace Base
 			quad++;
 		}
 
-
 		public static void DrawLine(Vector2 start, Vector2 end, Color4? color = null, float width = 2f)
 		{
 			if (quad >= QuadCount) Flush();
@@ -208,7 +210,8 @@ namespace Base
 			EndScene();
 
 			BeginScene(data.camera, fontShader);
-			fontShader.UploadUniformFloat2("u_ViewportSize", new Vector2(BaseWindow.Instance.Width, BaseWindow.Instance.Height));
+
+			fontShader.UploadUniformFloat2("u_ViewportSize", Viewport);
 
 			GL.BindTexture(TextureTarget.Texture2DArray, fontTexture);
 			GL.ActiveTexture(TextureUnit.Texture0);
