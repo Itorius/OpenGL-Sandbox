@@ -1,6 +1,4 @@
-﻿using OpenTK;
-
-namespace Raymarching
+﻿namespace Raymarching
 {
 	internal static class Program
 	{

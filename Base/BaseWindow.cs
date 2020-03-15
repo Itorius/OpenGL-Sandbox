@@ -61,12 +61,18 @@ namespace Base
 
 		protected override void OnKeyDown(KeyboardKeyEventArgs e)
 		{
-			foreach (Layer layer in Layers.TrickleDown()) layer.OnKeyDown(e);
+			foreach (Layer layer in Layers.TrickleDown())
+			{
+				if (layer.OnKeyDown(e)) break;
+			}
 		}
 
 		protected override void OnKeyUp(KeyboardKeyEventArgs e)
 		{
-			foreach (Layer layer in Layers.TrickleDown()) layer.OnKeyUp(e);
+			foreach (Layer layer in Layers.TrickleDown())
+			{
+				if (layer.OnKeyUp(e)) break;
+			}
 		}
 
 		protected override void OnKeyPress(KeyPressEventArgs e)

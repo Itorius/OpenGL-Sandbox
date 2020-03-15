@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using OpenTK;
 using System;
 using System.Globalization;
@@ -31,7 +32,6 @@ namespace Base
 		private static string listSeparator = CultureInfo.CurrentCulture.TextInfo.ListSeparator;
 
 		public float X;
-
 		public float Y;
 
 		public Vector2(float value)
@@ -359,7 +359,9 @@ namespace Base
 			return MathF.Acos(dot / l);
 		}
 
-		[XmlIgnore]
+		public static float Atan(Vector2 vector) => MathF.Atan2(vector.Y, vector.X);
+
+		[XmlIgnore, JsonIgnore]
 		public Vector2 Yx
 		{
 			get => new Vector2(Y, X);
@@ -449,6 +451,9 @@ namespace Base
 			return X == (double)other.X && Y == (double)other.Y;
 		}
 
-		public static Vector2 Transform(Vector2 vector, Matrix4 matrix) => new Vector2(vector.X + matrix.Row3.X, vector.Y - matrix.Row3.Y);
+		public static Vector2 Transform(Vector2 vector, Matrix4 matrix)
+		{
+			return Vector4.Transform(new Vector4(vector.X, vector.Y, 0f, 1f), matrix).Xy;
+		}
 	}
 }

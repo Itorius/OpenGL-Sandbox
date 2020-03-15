@@ -1,3 +1,4 @@
+using OpenTK;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,6 +29,22 @@ namespace Base
 		public readonly Line[] lines;
 		public readonly Vector2[] vertices;
 
+		public Polygon(Vector2[] vertices)
+		{
+			this.vertices = vertices;
+
+			List<Line> l = new List<Line>();
+			for (int i = 0; i < vertices.Length; i++)
+			{
+				Vector2 cV = vertices[i];
+				Vector2 cN = i + 1 >= vertices.Length ? vertices[0] : vertices[i + 1];
+
+				l.Add(new Line(cV, cN));
+			}
+
+			lines = l.ToArray();
+		}
+
 		public Polygon(Vector2 position, Vector2 size)
 		{
 			(float width, float height) = size;
@@ -37,16 +54,24 @@ namespace Base
 				position, new Vector2(position.X + width, position.Y), new Vector2(position.X + width, position.Y + height), new Vector2(position.X, position.Y + height)
 			};
 
-			lines = new[]
+			List<Line> l = new List<Line>();
+			for (int i = 0; i < vertices.Length; i++)
 			{
-				new Line(position, new Vector2(position.X + width, position.Y)),
-				new Line(new Vector2(position.X + width, position.Y), new Vector2(position.X + width, position.Y + height)),
-				new Line(new Vector2(position.X + width, position.Y + height), new Vector2(position.X, position.Y + height)),
-				new Line(new Vector2(position.X, position.Y + height), position)
-			};
+				Vector2 cV = vertices[i];
+				Vector2 cN = i + 1 >= vertices.Length ? vertices[0] : vertices[i + 1];
+
+				l.Add(new Line(cV, cN));
+			}
+
+			lines = l.ToArray();
 		}
 
 		public Line this[int index] => lines[index];
+
+		public static Polygon Transform(Polygon polygon, Matrix4 matrix)
+		{
+			return new Polygon(polygon.vertices.Select(vertex => Vector4.Transform(new Vector4(vertex.X, vertex.Y, 0f, 1f), matrix).Xy).Select(vertex => (Vector2)vertex).ToArray());
+		}
 	}
 
 	public static class Collision

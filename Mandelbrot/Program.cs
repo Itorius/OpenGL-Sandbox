@@ -1,6 +1,4 @@
-﻿using OpenTK;
-
-namespace Mandelbrot
+﻿namespace Mandelbrot
 {
 	internal static class Program
 	{

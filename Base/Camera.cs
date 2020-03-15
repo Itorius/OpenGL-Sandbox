@@ -5,6 +5,8 @@ namespace Raytracer
 	public class Camera
 	{
 		private Base.Vector2 position;
+		private Base.Vector2 viewport;
+		private float zoom=1f;
 
 		public Matrix4 View { get; private set; }
 		public Matrix4 Projection { get; private set; }
@@ -19,7 +21,8 @@ namespace Raytracer
 
 		public void SetViewport(int width, int height)
 		{
-			Projection = Matrix4.CreateOrthographic(width, height, -1f, 1f);
+			viewport = new Base.Vector2(width, height);
+			Projection = Matrix4.CreateOrthographic(width/zoom, height/zoom, -1f, 1f);
 			ViewProjection = View * Projection;
 		}
 
@@ -34,6 +37,13 @@ namespace Raytracer
 			this.position = position;
 
 			View = Matrix4.CreateTranslation(position.X, position.Y, 0f);
+			ViewProjection = View * Projection;
+		}
+
+		public void SetZoom(float zoom)
+		{
+			this.zoom = zoom;
+			Projection = Matrix4.CreateOrthographic(viewport.X / zoom, viewport.Y / zoom, -1f, 1f);
 			ViewProjection = View * Projection;
 		}
 	}

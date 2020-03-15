@@ -5,7 +5,6 @@ using Raytracer;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 
 namespace Base
 {
@@ -209,7 +208,7 @@ namespace Base
 			var data = scene;
 			EndScene();
 
-			BeginScene(data.camera, fontShader);
+			BeginScene(data.camera, fontShader, data.framebuffer);
 
 			fontShader.UploadUniformFloat2("u_ViewportSize", Viewport);
 
@@ -242,8 +241,82 @@ namespace Base
 					float xpos = x;
 					float ypos = y - MathF.Min(0, (glyph.Size.Y - glyph.Bearing.Y) * scale) - 10f;
 
-
 					DrawQuadTL(new Vector2(xpos - 10f * scale, ypos - 10f * scale), new Vector2(64f) * scale, color, texture: glyph.TextureSlot);
+				}
+
+				x += glyph.Advance * scale;
+				width += (c == ' ' ? 10f * scale : glyph.Size.X * scale * 0.5f) + glyph.Advance * scale * 0.5f;
+			}
+
+			EndScene();
+
+			BeginScene(data.camera, data.shader, data.framebuffer);
+
+			return new Vector2(width, height);
+		}
+
+		public static Vector2 DrawStringFlipped(string text, float x, float y, Color4? color = null, float scale = 1f)
+		{
+			var data = scene;
+			EndScene();
+
+			BeginScene(data.camera, fontShader, data.framebuffer);
+
+			fontShader.UploadUniformFloat2("u_ViewportSize", Viewport);
+
+			GL.BindTexture(TextureTarget.Texture2DArray, fontTexture);
+			GL.ActiveTexture(TextureUnit.Texture0);
+
+			color ??= Color4.White;
+
+			float origX = x;
+
+			float width = 0f;
+			float row = (glyphs.Max(glyph => glyph.Size.Y) + 5f) * scale;
+			float height = row;
+
+			foreach (char c in text)
+			{
+				Glyph glyph = glyphs[c];
+
+				if (c == '\n')
+				{
+					y -= row;
+					height += row;
+
+					x = origX;
+					continue;
+				}
+
+				if (c != ' ')
+				{
+					float xpos = x;
+					float ypos = y - MathF.Min(0, (glyph.Size.Y - glyph.Bearing.Y) * scale) - 10f;
+
+					{
+						float texture = glyph.TextureSlot;
+
+						if (quad >= QuadCount) Flush();
+
+						Matrix4 m = Matrix4.CreateScale(64f * scale, 64f * scale, 1f) * Matrix4.CreateTranslation(xpos - 10f * scale, ypos - 10f * scale, 0f);
+
+						Vertices[vertex] = new Vertex((new Vector4(0f, 0f, 0f, 1f) * m).Xyz, new Vector3(0f, 0f, texture), color.Value);
+						Vertices[vertex + 1] = new Vertex((new Vector4(1f, 0f, 0f, 1f) * m).Xyz, new Vector3(1f, 0f, texture), color.Value);
+						Vertices[vertex + 2] = new Vertex((new Vector4(1f, 1f, 0f, 1f) * m).Xyz, new Vector3(1f, 1f, texture), color.Value);
+						Vertices[vertex + 3] = new Vertex((new Vector4(0f, 1f, 0f, 1f) * m).Xyz, new Vector3(0f, 1f, texture), color.Value);
+
+						Indices[index] = vertex;
+						Indices[index + 1] = vertex + 1;
+						Indices[index + 2] = vertex + 2;
+						Indices[index + 3] = vertex + 2;
+						Indices[index + 4] = vertex + 3;
+						Indices[index + 5] = vertex + 0;
+
+						vertex += 4;
+						index += 6;
+
+						quad++;
+					}
 				}
 
 				x += glyph.Advance * scale;
@@ -252,7 +325,7 @@ namespace Base
 
 			EndScene();
 
-			BeginScene(data.camera, data.shader);
+			BeginScene(data.camera, data.shader, data.framebuffer);
 
 			return new Vector2(width, height);
 		}
