@@ -1,4 +1,3 @@
-using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using Raytracer;
@@ -23,7 +22,7 @@ namespace Base
 
 		private static Shader fontShader;
 		private static int fontTexture;
-		private static Glyph[] glyphs = new Glyph[256];
+		private static Glyph[] glyphs;
 
 		private struct SceneData
 		{
@@ -43,6 +42,7 @@ namespace Base
 			fontShader = new Shader("Assets/Shaders/Font.vert", "Assets/Shaders/Font.frag");
 
 			string[] files = Directory.GetFiles(@"Assets/Font");
+			glyphs = new Glyph[389];
 
 			GL.GenTextures(1, out fontTexture);
 			GL.BindTexture(TextureTarget.Texture2DArray, fontTexture);
