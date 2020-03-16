@@ -1,12 +1,12 @@
-using OpenTK;
+using Base;
 
 namespace Raytracer
 {
 	public class Camera
 	{
-		private Base.Vector2 position;
-		private Base.Vector2 viewport;
-		private float zoom=1f;
+		private Vector2 position;
+		private Vector2 viewport;
+		private float zoom = 1f;
 
 		public Matrix4 View { get; private set; }
 		public Matrix4 Projection { get; private set; }
@@ -21,8 +21,8 @@ namespace Raytracer
 
 		public void SetViewport(int width, int height)
 		{
-			viewport = new Base.Vector2(width, height);
-			Projection = Matrix4.CreateOrthographic(width/zoom, height/zoom, -1f, 1f);
+			viewport = new Vector2(width, height);
+			Projection = Matrix4.CreateOrthographic(width / zoom, height / zoom, -1f, 1f);
 			ViewProjection = View * Projection;
 		}
 
@@ -32,7 +32,7 @@ namespace Raytracer
 			ViewProjection = View * Projection;
 		}
 
-		public void SetPosition(Base.Vector2 position)
+		public void SetPosition(Vector2 position)
 		{
 			this.position = position;
 

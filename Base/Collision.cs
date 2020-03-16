@@ -1,4 +1,3 @@
-using OpenTK;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -70,7 +69,7 @@ namespace Base
 
 		public static Polygon Transform(Polygon polygon, Matrix4 matrix)
 		{
-			return new Polygon(polygon.vertices.Select(vertex => Vector4.Transform(new Vector4(vertex.X, vertex.Y, 0f, 1f), matrix).Xy).Select(vertex => (Vector2)vertex).ToArray());
+			return new Polygon(polygon.vertices.Select(vertex => Vector4.Transform(new Vector4(vertex.X, vertex.Y, 0f, 1f), matrix).Xy).Select(vertex => vertex).ToArray());
 		}
 	}
 

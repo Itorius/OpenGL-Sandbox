@@ -1,5 +1,4 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
+﻿using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.IO;
@@ -93,7 +92,6 @@ namespace Base
 			if (geo != null) GL.DeleteShader(geo.Value);
 		}
 
-
 		public void Bind() => GL.UseProgram(ID);
 
 		public void Unbind() => GL.UseProgram(0);
@@ -107,19 +105,19 @@ namespace Base
 		public void UploadUniformFloat2(string name, Vector2 value)
 		{
 			int location = GL.GetUniformLocation(ID, name);
-			GL.Uniform2(location, value);
+			GL.Uniform2(location, value.X, value.Y);
 		}
 
 		public void UploadUniformFloat3(string name, Vector3 value)
 		{
 			int location = GL.GetUniformLocation(ID, name);
-			GL.Uniform3(location, value);
+			GL.Uniform3(location, value.X, value.Y, value.Z);
 		}
 
 		public void UploadUniformFloat4(string name, Vector4 value)
 		{
 			int location = GL.GetUniformLocation(ID, name);
-			GL.Uniform4(location, value);
+			GL.Uniform4(location, value.X, value.Y, value.Z, value.W);
 		}
 
 		public void UploadUniformFloat4(string name, Color4 value)
@@ -128,16 +126,16 @@ namespace Base
 			GL.Uniform4(location, value);
 		}
 
-		public void UploadUniformMat3(string name, Matrix3 matrix)
+		public unsafe void UploadUniformMat3(string name, Matrix3 matrix)
 		{
 			int location = GL.GetUniformLocation(ID, name);
-			GL.UniformMatrix3(location, false, ref matrix);
+			GL.UniformMatrix3(location, 1, true, matrix.ToPointer());
 		}
 
-		public void UploadUniformMat4(string name, Matrix4 matrix)
+		public unsafe void UploadUniformMat4(string name, Matrix4 matrix)
 		{
 			int location = GL.GetUniformLocation(ID, name);
-			GL.UniformMatrix4(location, false, ref matrix);
+			GL.UniformMatrix4(location, 1, false, matrix.ToPointer());
 		}
 
 		public void UploadUniformInt(string name, int value)

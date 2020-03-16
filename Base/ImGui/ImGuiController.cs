@@ -266,7 +266,7 @@ void main()
 			io.KeyMap[(int)ImGuiKey.Z] = (int)Key.Z;
 		}
 
-		private void RenderImDrawData(ImDrawDataPtr draw_data)
+		private unsafe void RenderImDrawData(ImDrawDataPtr draw_data)
 		{
 			uint vertexOffsetInVertices = 0;
 			uint indexOffsetInElements = 0;
@@ -316,7 +316,7 @@ void main()
 			Matrix4 mvp = Matrix4.CreateOrthographicOffCenter(-1.0f, io.DisplaySize.X, io.DisplaySize.Y, 0.0f, -1.0f, 1.0f);
 
 			_shader.UseShader();
-			GL.ProgramUniformMatrix4(_shader.Program, _shader.GetUniformLocation("projection_matrix"), false, ref mvp);
+			GL.ProgramUniformMatrix4(_shader.Program, _shader.GetUniformLocation("projection_matrix"), 1, false, mvp.ToPointer());
 			GL.ProgramUniform1(_shader.Program, _shader.GetUniformLocation("in_fontTexture"), 0);
 			Util.CheckGLError("Projection");
 

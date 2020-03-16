@@ -1,4 +1,3 @@
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace Base
